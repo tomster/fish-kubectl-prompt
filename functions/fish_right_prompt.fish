@@ -8,16 +8,9 @@ function kubectl_status
     return
   end
 
-  set -l ctx (grep current-context ~/.kube/config | sed "s/current-context: //")
-  if [ $status -ne 0 ]
-    echo (set_color red)$KUBECTL_PROMPT_ICON" "(set_color white)"no context"
-    return
-  end
-
-  set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.namespace}")
-  set -l cluster (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.cluster}")
-  [ -z $ns ]; and set -l ns 'default'
-
+  set -l ctx (get_kubectl_context) 
+  set -l cluster $ctx[1]
+  set -l ns $ctx[2]
   echo (set_color cyan)$KUBECTL_PROMPT_ICON" "(set_color white)"($cluster$KUBECTL_PROMPT_SEPARATOR$ns)"
 end
 
